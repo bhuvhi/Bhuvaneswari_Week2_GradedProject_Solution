@@ -16,54 +16,67 @@ async function query1() {
 }
 
 async function query2() {
-  const newUser = await User.create({
-    name: "Alice",
-    email: "alice@example.com",
-    password: "hashed_password_8",
-    createdAt: new Date("2023-01-15T08:30:00Z"),
-  });
-
-  console.log("Created User:", newUser);
-  const users = await User.find({});
-  console.log("All Users:", users);
   const fetchedUser = await User.findOne({ email: "alice@example.com" });
   console.log("Fetched User:", fetchedUser);
 }
 
 async function query3() {
-  // Write code for Query 3 here
+  const fetchedQuestion = await Question.findOne({
+    title: "How can I improve the performance of a react app?",
+  });
+  console.log("Fetched Question:", fetchedQuestion);
 }
 
 async function query4() {
-  // Write code for Query 4 here
+  const questionsWithJavascriptTag = await Question.find({ tags: "javascript" });
+  console.log("Questions tagged with 'javascript':", questionsWithJavascriptTag);
 }
 
 async function query5() {
-  // Write code for Query 5 here
+  const questionsAfterApril2023 = await Question.find({
+    createdAt: { $gt: new Date("2023-04-01T00:00:00Z") },
+  });
+  console.log("Questions posted after April 1, 2023:", questionsAfterApril2023);
 }
 
 async function query6() {
-  // Write code for Query 6 here
+  const questionsWithJavascriptOrReact = await Question.find({
+    tags: { $in: ["javascript", "react"] },
+  });
+  console.log(
+    "Questions tagged with 'javascript' or 'react':",
+    questionsWithJavascriptOrReact
+  );
 }
 
 async function query7() {
-  // Write code for Query 7 here
+  const distinctTags = await Question.distinct("tags");
+  console.log("Distinct tags used in questions:", distinctTags);
 }
 
 async function query8() {
-  // Write code for Query 8 here
+  const questionsWithMin50Views = await Question.find({ views: { $gte: 50 } });
+  console.log("Questions with at least 50 views:", questionsWithMin50Views);
 }
 
 async function query9() {
-  // Write code for Query 9 here
+  const noVoteAnswers = await Answer.find({ voteCount: 0 });
+  console.log("Answers with a vote count of 0:", noVoteAnswers);
 }
 
 async function query10() {
-  // Write code for Query 10 here
+  const votedAnswers = await Answer.find({ voteCount: { $gt : 0 }});
+  console.log("Answers with a voteCount greater than 0:", votedAnswers);
 }
 
 async function query11() {
-  // Write code for Query 11 here
+  const fetchedUsers = await User.find({
+    createdAt: {
+      $gte: new Date("2023-01-01T00:00:00Z"),
+      $lt: new Date("2023-05-01T00:00:00Z"),
+    }
+  });
+  console.log("Users created between January 1, 2023 and May 1, 2023:", fetchedUsers);
 }
 
 async function query12() {
@@ -117,7 +130,6 @@ async function clearExistingData() {
 }
 
 async function runQueries() {
-  await clearExistingData();
   printHeader(
     1,
     "Create a user with name Robin, email robin@example.com, password hashed_password_7, and createdAt set to 2025-06-25T10:15:00Z",
@@ -137,7 +149,7 @@ async function runQueries() {
   printHeader(6, "Find all questions tagged with javascript or react");
   await query6();
   printHeader(7, "Find all the distinct tags used in questions");
-  await query7();
+  await query7(); 
   printHeader(8, "Retrieve all questions with at least 50 views");
   await query8();
   printHeader(9, "List all answers with a vote count of 0");
