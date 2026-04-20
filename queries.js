@@ -5,11 +5,29 @@ import Answer from "./models/Answer.js";
 import dotenv from "dotenv";
 
 async function query1() {
-  // Write code for Query 1 here
+  const newUser = await User.create({
+    name: "Robin",
+    email: "robin@example.com",
+    password: "hashed_password_7",
+    createdAt: new Date("2025-06-25T10:15:00Z"),
+  });
+
+  console.log("Created User:", newUser);
 }
 
 async function query2() {
-  // Write code for Query 2 here
+  const newUser = await User.create({
+    name: "Alice",
+    email: "alice@example.com",
+    password: "hashed_password_8",
+    createdAt: new Date("2023-01-15T08:30:00Z"),
+  });
+
+  console.log("Created User:", newUser);
+  const users = await User.find({});
+  console.log("All Users:", users);
+  const fetchedUser = await User.findOne({ email: "alice@example.com" });
+  console.log("Fetched User:", fetchedUser);
 }
 
 async function query3() {
@@ -84,7 +102,22 @@ async function query20() {
   // Write code for Query 20 here
 }
 
+async function clearExistingData() {
+  try {
+    await Promise.all([
+      User.deleteMany({}),
+      Question.deleteMany({}),
+      Answer.deleteMany({}),
+    ]);
+    console.log('Deleted existing data');
+  } catch (error) {
+    console.error('Error clearing existing data:', error);
+    throw error;
+  }
+}
+
 async function runQueries() {
+  await clearExistingData();
   printHeader(
     1,
     "Create a user with name Robin, email robin@example.com, password hashed_password_7, and createdAt set to 2025-06-25T10:15:00Z",
@@ -160,7 +193,7 @@ const printHeader = (num, title) => {
 async function main() {
   try {
     dotenv.config();
-    await mongoose.connect(process.env.MONGODB_URI);
+    await mongoose.connect(process.env.MONGODB_URL);
     console.log("Connected successfully to database");
     await runQueries();
   } catch (error) {
