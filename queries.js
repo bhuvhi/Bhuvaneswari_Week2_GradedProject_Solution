@@ -80,53 +80,95 @@ async function query11() {
 }
 
 async function query12() {
-  // Write code for Query 12 here
+  const question = await Question.findOne({ title: "How do I set up routing with react router v6?" });
+  const answer = await Answer.find({ questionId: question._id }).select('answerText author -_id');
+  console.log("Answers for the question:", answer);
 }
 
 async function query13() {
-  // Write code for Query 13 here
+  const usersWithAnswers = await Answer.distinct("author");
+  const usersWithoutAnswers = await User.find({ _id: { $nin: usersWithAnswers } });
+  console.log("Users who have not posted any answers:", usersWithoutAnswers);
 }
 
 async function query14() {
-  // Write code for Query 14 here
+  const topTwoQuestions = await Question.find()
+    .sort({ voteCount: -1 })
+    .limit(2);
+  console.log("Top two most upvoted questions:", topTwoQuestions);
 }
 
 async function query15() {
-  // Write code for Query 15 here
+  const usersWithAnswerCounts = await Answer.aggregate([
+    {
+      $group: {
+        _id: "$author",
+        answerCount: { $sum: 1 }
+      }
+    }
+  ]);
+  console.log("Users who have posted answers with their answer counts:", usersWithAnswerCounts);
 }
 
 async function query16() {
-  // Write code for Query 16 here
+  const topTwoUsers = await Answer.aggregate([
+    {
+      $group: {
+        _id: "$author",
+        answerCount: { $sum: 1 }
+      }
+    },
+    {
+      $sort: { answerCount: -1 }
+    },
+    {
+      $limit: 2
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "_id",
+        foreignField: "_id",
+        as: "userInfo"
+      }
+    },
+    {
+      $unwind: "$userInfo"
+    },
+    {
+      $project: {
+        name: "$userInfo.name"
+      }
+    }
+  ]);
+  console.log("Top two users who posted the most answers:", topTwoUsers);
 }
 
 async function query17() {
-  // Write code for Query 17 here
+  let fetchQuestion = await Question.findOne({ title: "Why is my async function returning a promise instead of the actual value?"});
+  await fetchQuestion.updateOne({ $set: { tags: ['javascript', 'async'] } }, { new: true });
+  fetchQuestion = await Question.findOne({ title: "Why is my async function returning a promise instead of the actual value?"});
+  console.log("Updated Question:", fetchQuestion);
 }
 
 async function query18() {
-  // Write code for Query 18 here
+  const updatedUser = await User.findOneAndUpdate(
+    { email: "alice@example.com" },
+    { name: "Alice Smith" },
+    { new: true }
+  );
+  console.log("Updated User:", updatedUser);
 }
 
 async function query19() {
-  // Write code for Query 19 here
+  const deletedUser = await User.findOneAndDelete({ email: 'jhonny@example.com' });
+  console.log("Deleted User:", deletedUser);
 }
 
 async function query20() {
-  // Write code for Query 20 here
-}
-
-async function clearExistingData() {
-  try {
-    await Promise.all([
-      User.deleteMany({}),
-      Question.deleteMany({}),
-      Answer.deleteMany({}),
-    ]);
-    console.log('Deleted existing data');
-  } catch (error) {
-    console.error('Error clearing existing data:', error);
-    throw error;
-  }
+  const user = await User.findOne({ email: 'alice@example.com' });
+  const deletedAnswers = await Answer.deleteMany({ author: user._id });
+  console.log("Deleted Answers:", deletedAnswers);
 }
 
 async function runQueries() {
@@ -135,7 +177,8 @@ async function runQueries() {
     "Create a user with name Robin, email robin@example.com, password hashed_password_7, and createdAt set to 2025-06-25T10:15:00Z",
   );
   await query1();
-  printHeader(2, "Fetch the user with email alice@example.com");
+  printHeader(2, 
+  "Fetch the user with email alice@example.com");
   await query2();
   printHeader(
     3,
